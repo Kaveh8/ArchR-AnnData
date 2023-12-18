@@ -41,7 +41,7 @@ class _Arrow:
     def to_adata(self, use_matrix="GeneScoreMatrix", outpath="./", write_h5ad=True):
         
         if not self._silent:
-            mtx = licorice_font.font_format(self._use_matrix, ["BOLD", "BLUE"])
+            mtx = licorice_font.font_format(use_matrix, ["BOLD", "BLUE"])
             print("Reading ArchR {} to AnnData".format(mtx))
         
         self._DataDict = _read_arrow_chromosome(self._file, use_matrix, self._verbose)
