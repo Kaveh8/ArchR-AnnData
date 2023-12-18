@@ -11,9 +11,10 @@ from ._Arrow import _Arrow
 
 def _read_arrow_to_adata(
     path,
-    matrices=["GeneScoreMatrix", "TileMatrix"],
+    matrices=["GeneScoreMatrix", "TileMatrix", "MotifMatrix"],
     metadata_keys=["ArchRVersion", "Class"],
     use_matrix="GeneScoreMatrix",
+    output_path="./",
     silent=False,
     write_h5ad=True,
 ):
@@ -63,6 +64,6 @@ def _read_arrow_to_adata(
     arrow = _Arrow(
         path, matrices=matrices, metadata_keys=metadata_keys, silent=silent
     )
-    arrow.to_adata(use_matrix=use_matrix, write_h5ad=write_h5ad)
+    arrow.to_adata(use_matrix=use_matrix, outpath=output_path, write_h5ad=write_h5ad)
 
     return arrow._adata
