@@ -86,6 +86,24 @@ def _fetch_chromosome_data_from_arrow_h5(chromosome, binary):
 
         return scipy.sparse.csr_matrix(X_empty)
     
+def _fetch_dev_data_from_arrow_h5(devs):
+    ncols = np.array(devs["jLengths"]).flatten().shape[0]
+    nrows = np.array(devs["rowMeans"]).flatten().shape[0]
+    X_empty = np.zeros([ncols, nrows])
+    j_lengths = np.append(0, np.array(devs["jLengths"]).flatten()).cumsum()
+    i = np.array(devs["i"]).flatten()
+    x = np.array(devs["x"]).flatten()
+
+
+    for row in range(len(X_empty)):
+        start_idx = j_lengths[row]
+        end_idx = j_lengths[row + 1]
+        row_vals = x[start_idx:end_idx]
+        col_indices = i[start_idx:end_idx] - 1
+        X_empty[row, col_indices] = row_vals
+
+    return scipy.sparse.csr_matrix(X_empty)
+
 
 def _read_arrow_chromosome(h5_file, use_matrix="GeneScoreMatrix", verbose=False):
 
@@ -98,14 +116,20 @@ def _read_arrow_chromosome(h5_file, use_matrix="GeneScoreMatrix", verbose=False)
         binary = False
 
     DataDict = {}
-    if verbose:
-        print("Loading chromosomes from Arrow:")
-    for chrom_key in tqdm(_ordered_chromosomes(), desc="Chromosomes"):
-        if chrom_key in chromosomes:
-            chromosome = h5_file[use_matrix][chrom_key]
-            if verbose:
-                print("- {}".format(chrom_key))
-            DataDict[chrom_key] = _fetch_chromosome_data_from_arrow_h5(chromosome, binary)
-        else:
-            print(" - Warning: {} not detected!".format(chrom_key))
+        
+    if use_matrix == "MotifMatrix":
+        if verbose:
+            print("Loading deviations from arrow file:")
+        DataDict["deviations"] = _fetch_dev_data_from_arrow_h5(h5_file[use_matrix]["deviations"])
+    else: 
+        if verbose:
+            print("Loading chromosomes from Arrow:")
+        for chrom_key in tqdm(_ordered_chromosomes(), desc="Chromosomes"):
+            if chrom_key in chromosomes:
+                chromosome = h5_file[use_matrix][chrom_key]
+                if verbose:
+                    print("- {}".format(chrom_key))
+                DataDict[chrom_key] = _fetch_chromosome_data_from_arrow_h5(chromosome, binary)
+            else:
+                print(" - Warning: {} not detected!".format(chrom_key))
     return DataDict
