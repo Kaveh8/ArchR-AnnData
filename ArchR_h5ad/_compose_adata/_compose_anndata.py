@@ -17,14 +17,16 @@ from ._write_h5ad import _write_h5ad
 def _compose_anndata(DataDict,
                      metadata,
                      feature_df,
+                     cell_names, 
                      use_matrix,
                      write_h5ad,
                      outpath,
                      silent,
+					 
                     ):
     
     adata = _dict_to_adata(DataDict)
-    adata = _add_obs_var(adata, metadata, feature_df)
+    adata = _add_obs_var(adata, metadata, feature_df, cell_names)
     adata = _cleanup_anndata(adata)
     
     if not silent:
