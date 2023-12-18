@@ -25,7 +25,7 @@ class _Arrow:
     def __init__(
         self,
         path,
-        matrices=["GeneScoreMatrix", "TileMatrix"],
+        matrices=["GeneScoreMatrix", "TileMatrix", "MotifMatrix"],
         metadata_keys=["ArchRVersion", "Class"],
         silent=False,
         verbose=False
@@ -52,6 +52,7 @@ class _Arrow:
         self._adata = _compose_anndata(DataDict=self._DataDict,
                                        metadata=self._file['Metadata'],
                                        feature_df=self._file[self._use_matrix]["Info"]["FeatureDF"],
+                                       cell_names=self._file[self._use_matrix]["Info"]["CellNames"],
                                        use_matrix=self._use_matrix,
                                        write_h5ad=write_h5ad,
                                        outpath=outpath,
