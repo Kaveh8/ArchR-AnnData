@@ -10,11 +10,11 @@ import numpy as np
 import pandas as pd
 
         
-def _add_obs(metadata, str_col_keys=["CellNames"]):
+def _add_obs(metadata, cell_names, str_col_keys=["CellNames"]):
 
     obs_dict = {}
     metadata_dict = {}
-
+    cell_names = pd.DataFrame(cell_names[()].astype('U'), columns=['CellNames'])
     for key, value in metadata.items():
         if value is None:
             metadata_dict[key] = value
@@ -28,7 +28,8 @@ def _add_obs(metadata, str_col_keys=["CellNames"]):
     for col in str_col_keys:
         if col in obs_df.columns:
             obs_df[col] = pd.Categorical(obs_df[col].str.decode("utf-8"))
-
+            
+    obs_df = obs_df[obs_df["CellNames"].isin(cell_names["CellNames"])]
     return obs_df, metadata_dict
 
 
@@ -42,11 +43,12 @@ def _add_var(feature_df, str_col_keys=["seqnames", "name"]):
         if col in var_df.columns:
             var_df[col] = pd.Categorical(var_df[col].str.decode("utf-8"))
 
+    var_df = var_df.drop_duplicates(subset='name', keep='first')
     return var_df
              
-def _add_obs_var(adata, metadata, feature_df):
+def _add_obs_var(adata, metadata, feature_df, cell_names):
     
     adata.var = _add_var(feature_df)
-    adata.obs, adata.uns['metadata_dict'] = _add_obs(metadata)
+    adata.obs, adata.uns['metadata_dict'] = _add_obs(metadata, cell_names)
     
     return adata
