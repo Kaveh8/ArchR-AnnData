@@ -40,20 +40,16 @@ class _Arrow:
 
     def to_adata(self, use_matrix="GeneScoreMatrix", outpath="./", write_h5ad=True):
         
-        
-        self._use_matrix = use_matrix
-        self._outpath = outpath
-        
         if not self._silent:
             mtx = licorice_font.font_format(self._use_matrix, ["BOLD", "BLUE"])
             print("Reading ArchR {} to AnnData".format(mtx))
         
-        self._DataDict = _read_arrow_chromosome(self._file, self._use_matrix, self._verbose)
+        self._DataDict = _read_arrow_chromosome(self._file, use_matrix, self._verbose)
         self._adata = _compose_anndata(DataDict=self._DataDict,
                                        metadata=self._file['Metadata'],
-                                       feature_df=self._file[self._use_matrix]["Info"]["FeatureDF"],
-                                       cell_names=self._file[self._use_matrix]["Info"]["CellNames"],
-                                       use_matrix=self._use_matrix,
+                                       feature_df=self._file[use_matrix]["Info"]["FeatureDF"],
+                                       cell_names=self._file[use_matrix]["Info"]["CellNames"],
+                                       use_matrix=use_matrix,
                                        write_h5ad=write_h5ad,
                                        outpath=outpath,
                                        silent=self._silent,
